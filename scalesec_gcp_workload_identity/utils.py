@@ -44,11 +44,16 @@ class Utils:
     def _assume_role(self) -> Tuple[str, str, str]:
         """
         Assumes the AWS IAM role used for federation
+
+        Returns:
+            aws_access_key: str - AWS access key from the assumed IAM role
+            aws_secret_access_key: str - AWS secret access key from the assumed IAM role
+            aws_session_token: str - AWS session token from the assumed IAM role
         """
 
-        # Assume CopyCat IAM role
+        # Assume AWS IAM role
         try:
-            logger.info("Assuming GCP CopyCat IAM Role.")
+            logger.info("Assuming AWS IAM Role.")
             assumed_role_object: dict = self.sts_client.assume_role(
                 RoleArn=f"arn:aws:iam::{self.aws_account_id}:role/{self.aws_role_name}",
                 RoleSessionName=self.aws_role_name
@@ -99,6 +104,11 @@ class Utils:
     def _generate_caller_identity_token(self, authorization_header, x_amz_date, x_goog_cloud_target_resource, credentials):
         """
         Create our Get Caller Identity Token object to be used by GCP
+
+        Returns:
+
+            identity_token: dict - a caller identity token similiar to whats generated via
+            https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html
         """
         identity_token = {
             "url": "https://sts.amazonaws.com?Action=GetCallerIdentity&Version=2011-06-15",
@@ -135,7 +145,7 @@ class Utils:
 
         Returns:
 
-            response: str - the federated access token
+            federated_token: str - the GCP service account federated access token
         """
         # token json must be url encoded
         encoded_token: str = urllib.parse.quote(json.dumps(caller_identity_token))
@@ -167,9 +177,10 @@ class Utils:
         Exchanges a federated token (limited service support) for a a better supported SA token
 
         Returns:
-            accessToken
+            accessToken: a GCP service account access token -
+            https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials#sa-credentials-oauth
 
-            expireTime
+            expireTime: also called the token lifetime. Default is 1 hour
         """
 
         # Create the body for our token exchange request
@@ -181,7 +192,8 @@ class Utils:
 
         # Add json headers and send the request
         headers = {"content-type": "application/json; charset=utf-8", "Accept": "application/json"}
-
+        
+        # TODO: try / except
         response = requests.post(f"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/{self.gcp_service_account_email}:generateAccessToken", json=body, headers=headers, auth=BearerAuth(federated_token))
 
         if response.status_code != 200:

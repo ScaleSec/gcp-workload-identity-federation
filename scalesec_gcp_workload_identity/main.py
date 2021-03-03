@@ -39,7 +39,7 @@ class TokenService:
 
     def get_token(self) -> Tuple[str, str]:
         """
-        Return a GCP Service Account Token
+        Return a GCP Service Account Access Token
         """
         aws_access_key, aws_secret_access_key, aws_session_token = self.utils._assume_role()
 
