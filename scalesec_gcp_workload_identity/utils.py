@@ -59,8 +59,9 @@ class Utils:
                 RoleSessionName=self.aws_role_name
             )
         except exceptions.ClientError as err:
-            logger.fatal(err)
-            exit(1)
+            raise err
+        except exceptions.ParamValidationError as err:
+            raise ValueError(f'The parameters you provided are incorrect: {err}')
 
         # Capture temporary credentials
         credentials: dict = assumed_role_object['Credentials']
@@ -169,7 +170,7 @@ class Utils:
         except KeyError:
             logger.fatal("Failed to get federated token")
             logger.error(response.text)
-            exit(1)
+            response.raise_for_status()
 
         return federated_token
     
@@ -194,13 +195,12 @@ class Utils:
         # Add json headers and send the request
         headers = {"content-type": "application/json; charset=utf-8", "Accept": "application/json"}
         
-        # TODO: try / except
         response = requests.post(f"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/{self.gcp_service_account_email}:generateAccessToken", json=body, headers=headers, auth=BearerAuth(federated_token))
 
         if response.status_code != 200:
             logger.fatal("Error getting SA token")
             logger.error(response.text)
-            exit(1)
+            response.raise_for_status()
 
         data = response.json()
         return data['accessToken'], data['expireTime']
