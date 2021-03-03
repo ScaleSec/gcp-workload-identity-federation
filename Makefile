@@ -19,6 +19,6 @@ clean:
 	rm -rf dist/*
 	rm -rf build/*
 
-dist: clean
+dist: clean test
 	source .venv/bin/activate && PKGVERSION=$(VERSION) python -m build
 	source .venv/bin/activate && python -m twine upload dist/*
