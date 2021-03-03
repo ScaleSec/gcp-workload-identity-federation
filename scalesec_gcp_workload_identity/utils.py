@@ -88,7 +88,7 @@ class Utils:
 
         return auth_headers
 
-    def _generate_auth_header(self, x_amz_date, credentials) -> str:
+    def _generate_auth_header(self, x_amz_date: str, credentials) -> str:
         """
         Create the authentication header needed by GCP
         """
@@ -101,7 +101,7 @@ class Utils:
 
         return signature
     
-    def _generate_caller_identity_token(self, authorization_header, x_amz_date, x_goog_cloud_target_resource, credentials):
+    def _generate_caller_identity_token(self, authorization_header: str, x_amz_date: str, x_goog_cloud_target_resource: str, credentials):
         """
         Create our Get Caller Identity Token object to be used by GCP
 
@@ -170,9 +170,10 @@ class Utils:
             logger.fatal("Failed to get federated token")
             logger.error(response.text)
             exit(1)
+
         return federated_token
     
-    def _get_sa_token(self, federated_token) -> Tuple[str, str]:
+    def _get_sa_token(self, federated_token: str) -> Tuple[str, str]:
         """
         Exchanges a federated token (limited service support) for a a better supported SA token
 
