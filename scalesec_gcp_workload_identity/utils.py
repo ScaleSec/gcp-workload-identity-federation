@@ -1,6 +1,5 @@
 import json
 import logging
-from sys import exit
 from typing import Tuple
 import urllib.parse
 
@@ -64,14 +63,19 @@ class Utils:
             raise ValueError(f'The parameters you provided are incorrect: {err}')
 
         # Capture temporary credentials
-        credentials: dict = assumed_role_object['Credentials']
+        try:
+            credentials: dict = assumed_role_object['Credentials']
 
-        # Create our temporay credentials to use in our SigV4 
-        # Caller Identity Token signing process
-        aws_access_key: str = credentials['AccessKeyId']
-        aws_secret_access_key: str = credentials['SecretAccessKey']
-        aws_session_token: str = credentials['SessionToken']
-
+            # Create our temporay credentials to use in our SigV4 
+            # Caller Identity Token signing process
+            aws_access_key: str = credentials['AccessKeyId']
+            aws_secret_access_key: str = credentials['SecretAccessKey']
+            aws_session_token: str = credentials['SessionToken']
+        
+        except KeyError as err:
+            logger.error("Something went wrong getting AssumeRole credentials")
+            raise err 
+        
         return aws_access_key, aws_secret_access_key, aws_session_token
 
     def _signed_request(self, data=None, params=None, headers=None, credentials=None) -> str:
@@ -108,7 +112,7 @@ class Utils:
 
         Returns:
 
-            identity_token: dict - a caller identity token similiar to whats generated via
+            identity_token: dict - a caller identity token similar to whats generated via
             https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html
         """
         identity_token = {
