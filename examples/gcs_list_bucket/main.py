@@ -33,7 +33,7 @@ def main():
     # Export this as an environment variable
     bucket_name = getenv("BUCKET_NAME")
 
-    # List objects in our bucket using out GCP SA Access token
+    # List objects in our bucket using our GCP SA Access token
     try:
         files = storage_client.list_blobs(bucket_name)
         print(f"Files in {bucket_name} are: {files}")
