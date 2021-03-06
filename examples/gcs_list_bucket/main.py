@@ -1,11 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 from scalesec_gcp_workload_identity.main import TokenService
 from os import getenv
-from google.cloud import storage 
-from google.api_core import exceptions # pylint: disable=import-error
-
-
+from google.api_core import exceptions
+import requests
+import json
 
 def main():
 
@@ -26,20 +25,24 @@ def main():
     # This sa_token is used for listing objects in our bucket
     sa_token, expiry_date = token_service.get_token()
 
-    # Create the GCS client with our newly generated SA token
-    storage_client = storage.Client(credentials = f"{sa_token}")
-
-    # The name for the new bucket 
+    # The name for the bucket we want to list object in
     # Export this as an environment variable
     bucket_name = getenv("BUCKET_NAME")
 
     # List objects in our bucket using our GCP SA Access token
     try:
-        files = storage_client.list_blobs(bucket_name)
-        print(f"Files in {bucket_name} are: {files}")
+        files = requests.get(
+            f'https://storage.googleapis.com/storage/v1/b/{bucket_name}/o/?fields=items/name',
+            params={'access_token': sa_token}).json()
     except Exception as e:
         print(e)
         raise
+    
+    # Make our object names pretty!
+    object_names = json.dumps(files, indent=4)
+    
+    # Print our object names found in our bucket 
+    print(f"The items in bucket {bucket_name} are: {object_names}")
 
-if __name__ == "main":
+if __name__ == "__main__":
     main()
