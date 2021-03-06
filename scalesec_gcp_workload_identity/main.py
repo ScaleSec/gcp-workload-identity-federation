@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 class TokenService:
     def __init__(self, gcp_project_number: str, gcp_workload_id: str, gcp_workload_provider:str, gcp_service_account_email: str, aws_account_id: str, aws_role_name: str, aws_region: str) -> None:
+
         # GCP
         self.gcp_project_number = gcp_project_number
         self.gcp_workload_id = gcp_workload_id
@@ -17,7 +18,7 @@ class TokenService:
         self.gcp_federated_token = None
         self.gcp_sa_token = None
         self.authorization_header = None
-        
+
         # AWS 
         self.method = "POST"
         self.host = "sts.amazonaws.com"
@@ -41,6 +42,7 @@ class TokenService:
         """
         Return a GCP Service Account Access Token
         """
+
         aws_access_key, aws_secret_access_key, aws_session_token = self.utils._assume_role()
 
         # create a ReadOnlyCredentials object with the assume_role credentials
@@ -53,7 +55,7 @@ class TokenService:
 
         # create the Authorization header
         authorization_header = self.utils._generate_auth_header(x_amz_date, credentials)
-        
+
         # generate the identity token
         caller_identity_token = self.utils._generate_caller_identity_token(authorization_header, x_amz_date, self.x_goog_cloud_target_resource, credentials)
 
