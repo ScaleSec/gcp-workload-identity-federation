@@ -1,6 +1,5 @@
 import json
 import logging
-from sys import exit
 from typing import Tuple
 import urllib.parse
 
@@ -59,17 +58,23 @@ class Utils:
                 RoleSessionName=self.aws_role_name
             )
         except exceptions.ClientError as err:
-            logger.fatal(err)
-            exit(1)
+            raise err
+        except exceptions.ParamValidationError as err:
+            raise ValueError(f'The parameters you provided are incorrect: {err}')
 
         # Capture temporary credentials
-        credentials: dict = assumed_role_object['Credentials']
+        try:
+            credentials: dict = assumed_role_object['Credentials']
 
-        # Create our temporay credentials to use in our SigV4 
-        # Caller Identity Token signing process
-        aws_access_key: str = credentials['AccessKeyId']
-        aws_secret_access_key: str = credentials['SecretAccessKey']
-        aws_session_token: str = credentials['SessionToken']
+            # Create our temporay credentials to use in our SigV4 
+            # Caller Identity Token signing process
+            aws_access_key: str = credentials['AccessKeyId']
+            aws_secret_access_key: str = credentials['SecretAccessKey']
+            aws_session_token: str = credentials['SessionToken']
+
+        except KeyError as err:
+            logger.error("Something went wrong getting AssumeRole credentials")
+            raise err 
 
         return aws_access_key, aws_secret_access_key, aws_session_token
 
@@ -77,6 +82,7 @@ class Utils:
         """
         Function to sign a request using botocore implementation
         """
+
         request = AWSRequest(method=self.method, url=self.url, data=data, params=params, headers=headers)
 
         # inject auth header into requests object
@@ -88,28 +94,29 @@ class Utils:
 
         return auth_headers
 
-    def _generate_auth_header(self, x_amz_date, credentials) -> str:
+    def _generate_auth_header(self, x_amz_date: str, credentials) -> str:
         """
         Create the authentication header needed by GCP
         """
 
         # these are the headers we want signed
         headers = {'host': self.host, 'x-amz-date': x_amz_date,'x-amz-security-token': credentials.token}
-        
+
         # create the signed request which will return the Authorization header
         signature = self._signed_request(params=None, data=None, headers=headers, credentials=credentials)
 
         return signature
-    
-    def _generate_caller_identity_token(self, authorization_header, x_amz_date, x_goog_cloud_target_resource, credentials):
+
+    def _generate_caller_identity_token(self, authorization_header: str, x_amz_date: str, x_goog_cloud_target_resource: str, credentials):
         """
         Create our Get Caller Identity Token object to be used by GCP
 
         Returns:
 
-            identity_token: dict - a caller identity token similiar to whats generated via
+            identity_token: dict - a caller identity token similar to whats generated via
             https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html
         """
+
         identity_token = {
             "url": "https://sts.amazonaws.com?Action=GetCallerIdentity&Version=2011-06-15",
             "method": self.method,
@@ -147,6 +154,7 @@ class Utils:
 
             federated_token: str - the GCP service account federated access token
         """
+
         # token json must be url encoded
         encoded_token: str = urllib.parse.quote(json.dumps(caller_identity_token))
 
@@ -169,10 +177,11 @@ class Utils:
         except KeyError:
             logger.fatal("Failed to get federated token")
             logger.error(response.text)
-            exit(1)
+            response.raise_for_status()
+
         return federated_token
-    
-    def _get_sa_token(self, federated_token) -> Tuple[str, str]:
+
+    def _get_sa_token(self, federated_token: str) -> Tuple[str, str]:
         """
         Exchanges a federated token (limited service support) for a a better supported SA token
 
@@ -192,14 +201,13 @@ class Utils:
 
         # Add json headers and send the request
         headers = {"content-type": "application/json; charset=utf-8", "Accept": "application/json"}
-        
-        # TODO: try / except
+
         response = requests.post(f"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/{self.gcp_service_account_email}:generateAccessToken", json=body, headers=headers, auth=BearerAuth(federated_token))
 
         if response.status_code != 200:
             logger.fatal("Error getting SA token")
             logger.error(response.text)
-            exit(1)
+            response.raise_for_status()
 
         data = response.json()
         return data['accessToken'], data['expireTime']

@@ -16,13 +16,13 @@ load_dotenv(dotenv_path=dotenv_path)
 
 # init the token service
 token_service = TokenService(
-  gcp_project_number=getenv('gcp_project_number'),
-  gcp_workload_id=getenv('gcp_workload_id'),
-  gcp_workload_provider=getenv('gcp_workload_provider'),
-  gcp_service_account_email=getenv('gcp_service_account_email'),
-  aws_account_id=getenv('aws_account_id'),
-  aws_role_name=getenv('aws_role_name'),
-  aws_region=getenv('aws_region')
+  gcp_project_number=getenv('GCP_PROJECT_NUMBER'),
+  gcp_workload_id=getenv('GCP_WORKLOAD_ID'),
+  gcp_workload_provider=getenv("GCP_WORKLOAD_PROVIDER"),
+  gcp_service_account_email=getenv('GCP_SERVICE_ACCOUNT_EMAIL'),
+  aws_account_id=getenv('AWS_ACCOUNT_ID'),
+  aws_role_name=getenv('AWS_ROLE_NAME'),
+  aws_region=getenv('AWS_REGION')
 )
 
 # get token
@@ -31,6 +31,9 @@ sa_token, _ = token_service.get_token()
 # todo: unit test v4 signature
 
 def test_token_type():
+  """
+  token will be dict if the call failed
+  """
   assert type(sa_token) is str
 
 def test_token_signature():
