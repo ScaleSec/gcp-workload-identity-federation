@@ -1,12 +1,12 @@
-# GCS list objects
+# GKE list clusters with curl
 
-This example uses the service account OAuth access token as an access token in an API request using the `requests` python library.
+This example uses the service account OAuth access token as an authorization bearer in a curl request. 
 
 Before using this example, follow the [README](../../README.md) to configure your environment properly.
 
 ## Example Overview:
 
-We generate our access token:
+We generate our access token and print it to stdout:
 ```python
     token_service = TokenService(
         gcp_project_number=getenv('GCP_PROJECT_NUMBER'),
@@ -19,14 +19,12 @@ We generate our access token:
     )
 
     sa_token, expiry_date = token_service.get_token()
+
+    print(f"The service account OAuth token is: \n {sa_token}")
 ```
 
-Using the `requests` library we can pass in our ephemeral service account token `sa_token` in the parameters field:
+Using our output, we add the `access_token` value into a `curl` command on our cli:
 
-```python
-requests.get(
-    f'https://storage.googleapis.com/storage/v1/b/{bucket_name}/o/?fields=items/name',
-    params={'access_token': sa_token}).json()
+```bash
+curl -H "Authorization: Bearer $ACCESS_TOKEN" "https://container.googleapis.com/v1/projects/$GCP_PROJECT_ID/zones/$ZONE/clusters"
 ```
-
-The full code example can be found in [main.py](./main.py)
