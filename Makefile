@@ -13,7 +13,7 @@ dev:
 	source .venv/bin/activate && pip install -r dev_requirements.txt
 
 test: 
-	@PYTHONPATH=$(shell pwd) pytest --log-cli-level=10
+	@source .env && PYTHONPATH=$(shell pwd) pytest --log-cli-level=10
 
 clean:
 	rm -rf dist/*
