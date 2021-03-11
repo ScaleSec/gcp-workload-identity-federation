@@ -1,6 +1,6 @@
 # Scalesec GCP Workload Identity Federation
 
-This package provides a python module to federate access from AWS to GCP using Workload Identity.
+This package provides a python module to federate access from AWS to GCP using Workload Identity. View our [blog](https://scalesec.com/blog/access-gcp-from-aws-using-workload-identity-federation/) for additional details.
 
 ## Prerequisites 
 * A GCP service account (environment variable "GCP_SERVICE_ACCOUNT_EMAIL")
