@@ -1,31 +1,46 @@
+"""
+Utility functions and classes.
+"""
+
 import json
 import logging
 from typing import Tuple
 import urllib.parse
 
-import boto3
-from botocore import exceptions
-from botocore.auth import SigV4Auth
-from botocore.awsrequest import AWSRequest
-import requests
+import boto3 #pylint: disable=import-error
+from botocore import exceptions #pylint: disable=import-error
+from botocore.auth import SigV4Auth #pylint: disable=import-error
+from botocore.awsrequest import AWSRequest #pylint: disable=import-error
+import requests #pylint: disable=import-error
 
 
 logger = logging.getLogger(__name__)
 
 
-class BearerAuth(requests.auth.AuthBase):
+class BearerAuth(requests.auth.AuthBase): #pylint: disable=too-few-public-methods
     """
     Returns a requests authorization object with the bearer token
     """
     def __init__(self, token):
         self.token = token
-    def __call__(self, r):
-        r.headers["authorization"] = "Bearer " + self.token
-        return r
+    def __call__(self, auth_request):
+        auth_request.headers["authorization"] = "Bearer " + self.token
+        return auth_request
 
 
-class Utils:
-    def __init__(self, aws_account_id: str, aws_role_name: str, aws_region: str, method: str, host: str, gcp_service_account_email: str) -> None:
+class Utils: #pylint: disable=too-many-instance-attributes,too-few-public-methods
+    """
+    Utility for AWS STS.
+    """
+    def __init__( #pylint: disable=too-many-arguments
+        self,
+        aws_account_id: str,
+        aws_role_name: str,
+        aws_region: str,
+        method: str,
+        host: str,
+        gcp_service_account_email: str
+        ) -> None:
 
         # Init STS client
         self.sts_client = boto3.client('sts')
@@ -60,13 +75,13 @@ class Utils:
         except exceptions.ClientError as err:
             raise err
         except exceptions.ParamValidationError as err:
-            raise ValueError(f'The parameters you provided are incorrect: {err}')
+            raise ValueError(f'The parameters you provided are incorrect: {err}') #pylint: disable=raise-missing-from
 
         # Capture temporary credentials
         try:
             credentials: dict = assumed_role_object['Credentials']
 
-            # Create our temporay credentials to use in our SigV4 
+            # Create our temporay credentials to use in our SigV4
             # Caller Identity Token signing process
             aws_access_key: str = credentials['AccessKeyId']
             aws_secret_access_key: str = credentials['SecretAccessKey']
@@ -74,7 +89,7 @@ class Utils:
 
         except KeyError as err:
             logger.error("Something went wrong getting AssumeRole credentials")
-            raise err 
+            raise err
 
         return aws_access_key, aws_secret_access_key, aws_session_token
 
@@ -83,7 +98,13 @@ class Utils:
         Function to sign a request using botocore implementation
         """
 
-        request = AWSRequest(method=self.method, url=self.url, data=data, params=params, headers=headers)
+        request = AWSRequest(
+            method=self.method,
+            url=self.url,
+            data=data,
+            params=params,
+            headers=headers
+            )
 
         # inject auth header into requests object
         # SigV4Auth will split the query string automatically
@@ -100,14 +121,28 @@ class Utils:
         """
 
         # these are the headers we want signed
-        headers = {'host': self.host, 'x-amz-date': x_amz_date,'x-amz-security-token': credentials.token}
+        headers = {
+            'host': self.host,
+            'x-amz-date': x_amz_date,
+            'x-amz-security-token': credentials.token
+            }
 
         # create the signed request which will return the Authorization header
-        signature = self._signed_request(params=None, data=None, headers=headers, credentials=credentials)
+        signature = self._signed_request(
+            params=None,
+            data=None,
+            headers=headers,
+            credentials=credentials
+            )
 
         return signature
 
-    def _generate_caller_identity_token(self, authorization_header: str, x_amz_date: str, x_goog_cloud_target_resource: str, credentials):
+    def _generate_caller_identity_token(
+        self, authorization_header: str,
+        x_amz_date: str,
+        x_goog_cloud_target_resource: str,
+        credentials
+        ):
         """
         Create our Get Caller Identity Token object to be used by GCP
 
@@ -146,7 +181,11 @@ class Utils:
 
         return identity_token
 
-    def _get_federated_access_token(self, caller_identity_token: dict, x_goog_cloud_target_resource: str) -> str:
+    def _get_federated_access_token( #pylint: disable=no-self-use
+        self,
+        caller_identity_token: dict,
+        x_goog_cloud_target_resource: str
+        ) -> str:
         """
         Exchange our Caller Identity Token for a GCP federated token
 
@@ -171,7 +210,11 @@ class Utils:
         # Add json headers and send the request
         headers = {"content-type": "application/json; charset=utf-8"}
 
-        response = requests.post("https://sts.googleapis.com/v1beta/token", json=body, headers=headers)
+        response = requests.post(
+            "https://sts.googleapis.com/v1beta/token",
+            json=body,
+            headers=headers
+            )
         try:
             federated_token: str = response.json()['access_token']
         except KeyError:
@@ -202,7 +245,12 @@ class Utils:
         # Add json headers and send the request
         headers = {"content-type": "application/json; charset=utf-8", "Accept": "application/json"}
 
-        response = requests.post(f"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/{self.gcp_service_account_email}:generateAccessToken", json=body, headers=headers, auth=BearerAuth(federated_token))
+        response = requests.post(
+            f"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/{self.gcp_service_account_email}:generateAccessToken", #pylint: disable=line-too-long
+            json=body,
+            headers=headers,
+            auth=BearerAuth(federated_token)
+            )
 
         if response.status_code != 200:
             logger.fatal("Error getting SA token")
