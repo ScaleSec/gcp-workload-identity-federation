@@ -34,11 +34,11 @@ jobs:
         with:
           python-root-list: "scalesec_gcp_workload_identity tests examples"
           use-pylint: true
-          use-pycodestyle: true
-          use-flake8: true
-          use-black: true
-          use-mypy: true
-          use-isort: true
+          use-pycodestyle: false
+          use-flake8: false
+          use-black: false
+          use-mypy: false
+          use-isort: false
           extra-pylint-options: ""
           extra-pycodestyle-options: ""
           extra-flake8-options: ""
