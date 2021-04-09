@@ -1,12 +1,20 @@
-#!/usr/bin/env python
+"""
+This is an example script
+to generate a SA access token
+and list available GKE clusters.
+"""
 
-from scalesec_gcp_workload_identity.main import TokenService
 from os import getenv
-from google.api_core import exceptions
+from scalesec_gcp_workload_identity.main import TokenService #pylint: disable=import-error
+
 
 def main():
+    """
+    Generates a token and
+    lists GKE clusters.
+    """
 
-    # The arguments to TokenService can be ingested 
+    # The arguments to TokenService can be ingested
     # from the environment if they were exported above.
     # Otherwise, pass in your own arguments
     token_service = TokenService(
@@ -21,9 +29,11 @@ def main():
 
     # Return our GCP SA access token
     # This sa_token is used for listing our GKE clusters
-    sa_token, expiry_date = token_service.get_token()
-    
+    sa_token, expiry_date = token_service.get_token() #pylint: disable=unused-variable
+
     print(f"The service account OAuth token is: \n {sa_token}")
+
+    #TODO: Finish logic. No idea why it's missing?
 
 if __name__ == "__main__":
     main()

@@ -1,14 +1,23 @@
+"""
+This is an example script
+to generate a SA access token
+and download objects from a GCS bucket.
+"""
 #!/usr/bin/env python
 
-from scalesec_gcp_workload_identity.main import TokenService
-from os import getenv
-from google.api_core import exceptions
-import requests
 import json
+from os import getenv
+import requests #pylint: disable=import-error
+from scalesec_gcp_workload_identity.main import TokenService #pylint: disable=import-error
+
 
 def main():
+    """
+    Generates an access token
+    and downloads objects from a GCS bucket.
+    """
 
-    # The arguments to TokenService can be ingested 
+    # The arguments to TokenService can be ingested
     # from the environment if they were exported above.
     # Otherwise, pass in your own arguments
     token_service = TokenService(
@@ -23,7 +32,7 @@ def main():
 
     # Return our GCP SA access token
     # This sa_token is used for listing objects in our bucket
-    sa_token, expiry_date = token_service.get_token()
+    sa_token, expiry_date = token_service.get_token() #pylint: disable=unused-variable
 
     # The name for the bucket we want to list object in
     # Export this as an environment variable
@@ -34,15 +43,16 @@ def main():
         files = requests.get(
             f'https://storage.googleapis.com/storage/v1/b/{bucket_name}/o/?fields=items/name',
             params={'access_token': sa_token}).json()
-    except Exception as e:
-        print(e)
+    except Exception as error:
+        print(error)
         raise
-    
+
     # Make our object names pretty!
     object_names = json.dumps(files, indent=4)
-    
-    # Print our object names found in our bucket 
+
+    # Print our object names found in our bucket
     print(f"The items in bucket {bucket_name} are: {object_names}")
+
 
 if __name__ == "__main__":
     main()
