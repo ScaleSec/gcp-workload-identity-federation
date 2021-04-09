@@ -1,0 +1,53 @@
+# python code linter
+# from: https://github.com/ricardochaves/python-lint
+
+
+name: "Python Code Quality and Lint"
+description: "Lint python code in a GitHub action."
+
+#############################
+# Start the job on all push #
+#############################
+on:
+  push:
+    branches-ignore:
+      - 'main'
+
+###############
+# Set the Job #
+###############
+jobs:
+  build:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+
+    ##################
+    # Load all steps #
+    ##################
+    steps:
+      ############################
+      ## Checkout the code base ##
+      ############################
+      steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+
+      ##################################
+      ## Run Linter against code base ##
+      ##################################
+      - name: Lint Python Code
+        uses: ricardochaves/python-lint@v1.3.0
+          with:
+            python-root-list: "scalesec_gcp_workload_identity tests"
+            use-pylint: true
+            use-pycodestyle: true
+            use-flake8: true
+            use-black: true
+            use-mypy: true
+            use-isort: true
+            extra-pylint-options: ""
+            extra-pycodestyle-options: ""
+            extra-flake8-options: ""
+            extra-black-options: ""
+            extra-mypy-options: ""
+            extra-isort-options: ""
