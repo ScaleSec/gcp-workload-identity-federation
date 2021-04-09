@@ -3,7 +3,6 @@
 
 
 name: "Python Code Quality and Lint"
-description: "Lint python code in a GitHub action."
 
 #############################
 # Start the job on all push #
