@@ -37,7 +37,7 @@ jobs:
       - name: Lint Python Code
         uses: ricardochaves/python-lint@v1.3.0
         with:
-          python-root-list: "scalesec_gcp_workload_identity tests"
+          python-root-list: "scalesec_gcp_workload_identity tests examples"
           use-pylint: true
           use-pycodestyle: true
           use-flake8: true
