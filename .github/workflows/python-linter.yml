@@ -3,22 +3,17 @@
 
 
 name: "Python Code Quality and Lint"
-description: "Lint python code in a GitHub action."
 
 #############################
 # Start the job on all push #
 #############################
-on:
-  push:
-    branches-ignore:
-      - 'main'
+on: [push]
 
 ###############
 # Set the Job #
 ###############
 jobs:
-  build:
-    name: Lint Code Base
+  lint:
     runs-on: ubuntu-latest
 
     ##################
@@ -37,13 +32,13 @@ jobs:
       - name: Lint Python Code
         uses: ricardochaves/python-lint@v1.3.0
         with:
-          python-root-list: "scalesec_gcp_workload_identity tests"
+          python-root-list: "scalesec_gcp_workload_identity tests examples"
           use-pylint: true
-          use-pycodestyle: true
-          use-flake8: true
-          use-black: true
-          use-mypy: true
-          use-isort: true
+          use-pycodestyle: false
+          use-flake8: false
+          use-black: false
+          use-mypy: false
+          use-isort: false
           extra-pylint-options: ""
           extra-pycodestyle-options: ""
           extra-flake8-options: ""
