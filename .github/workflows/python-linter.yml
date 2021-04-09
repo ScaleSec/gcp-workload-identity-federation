@@ -8,17 +8,13 @@ description: "Lint python code in a GitHub action."
 #############################
 # Start the job on all push #
 #############################
-on:
-  push:
-    branches-ignore:
-      - 'main'
+on: [push]
 
 ###############
 # Set the Job #
 ###############
 jobs:
-  build:
-    name: Lint Code Base
+  lint:
     runs-on: ubuntu-latest
 
     ##################
