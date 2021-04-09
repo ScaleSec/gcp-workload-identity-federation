@@ -3,47 +3,53 @@
 
 
 name: "Python Code Quality and Lint"
-description: "Supports Pylint, pycodestyle, Flake8, black, mypy and isort"
-inputs:
-  python-root-list:
-    description: "A list of all paths to test"
-    required: false
-    default: "scalesec_gcp_workload_identity/"
-  use-pylint:
-    description: "Use Pylint"
-    required: false
-    default: true
-  use-pycodestyle:
-    description: "Use pycodestyle"
-    required: false
-    default: true
-  use-flake8:
-    description: "Use Flake8"
-    required: false
-    default: true
-  use-black:
-    description: "Use Black"
-    required: false
-    default: true
-  use-mypy:
-    description: "Use mypy"
-    required: false
-    default: true
-  use-isort:
-    description: "Use isort"
-    required: false
-    default: true
-runs:
-  using: "docker"
-  image: "Dockerfile"
-  args:
-    - ${{ inputs.python-root-list }}
-    - ${{ inputs.use-pylint }}
-    - ${{ inputs.use-pycodestyle }}
-    - ${{ inputs.use-flake8 }}
-    - ${{ inputs.use-black }}
-    - ${{ inputs.use-mypy }}
-    - ${{ inputs.use-isort }}
-branding:
-  icon: "terminal"
-  color: "white"
+description: "Lint python code in a GitHub action."
+
+#############################
+# Start the job on all push #
+#############################
+on:
+  push:
+    branches-ignore:
+      - 'main'
+
+###############
+# Set the Job #
+###############
+jobs:
+  build:
+    # Name the Job
+    name: Lint Code Base
+    # Set the agent to run on
+    runs-on: ubuntu-latest
+
+    ##################
+    # Load all steps #
+    ##################
+    steps:
+      ##########################
+      # Checkout the code base #
+      ##########################
+      steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+
+      ################################
+      # Run Linter against code base #
+      ################################
+      - name: Lint Python Code
+        uses: ricardochaves/python-lint@v1.3.0
+         with:
+          python-root-list: "scalesec_gcp_workload_identity tests"
+          use-pylint: true
+          use-pycodestyle: true
+          use-flake8: true
+          use-black: true
+          use-mypy: true
+          use-isort: true
+          extra-pylint-options: ""
+          extra-pycodestyle-options: ""
+          extra-flake8-options: ""
+          extra-black-options: ""
+          extra-mypy-options: ""
+          extra-isort-options: ""
