@@ -6,12 +6,14 @@ for failures.
 import logging
 from os import getenv
 from os.path import join, dirname
+import pytest #pylint: disable=import-error
 
 from dotenv import load_dotenv #pylint: disable=import-error
-from scalesec_gcp_workload_identity.main import TokenService #pylint: disable=import-error
-import pytest #pylint: disable=import-error
 from botocore.exceptions import ClientError #pylint: disable=import-error
 from requests.exceptions import HTTPError #pylint: disable=import-error
+
+from scalesec_gcp_workload_identity.main import TokenService #pylint: disable=import-error
+
 
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger('gcp_token_federation').setLevel(logging.DEBUG)
