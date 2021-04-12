@@ -33,7 +33,5 @@ def main():
 
     print(f"The service account OAuth token is: \n {sa_token}")
 
-    #TODO: Finish logic. No idea why it's missing?
-
 if __name__ == "__main__":
     main()
