@@ -11,7 +11,7 @@ import requests #pylint: disable=import-error
 from scalesec_gcp_workload_identity.main import TokenService #pylint: disable=import-error
 
 
-def main():
+def gcs_object_lister():
     """
     Generates an access token
     and downloads objects from a GCS bucket.
@@ -55,4 +55,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    gcs_object_lister()

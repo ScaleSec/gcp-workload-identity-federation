@@ -32,7 +32,7 @@ token_service = TokenService(
 # get token
 sa_token, _ = token_service.get_token()
 
-# todo: unit test v4 signature
+# todo: unit test v4 signature #pylint: disable=fixme
 
 def test_token_type():
     """

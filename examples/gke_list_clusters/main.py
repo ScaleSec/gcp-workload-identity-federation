@@ -8,7 +8,7 @@ from os import getenv
 from scalesec_gcp_workload_identity.main import TokenService #pylint: disable=import-error
 
 
-def main():
+def gke_lister():
     """
     Generates a token and
     lists GKE clusters.
@@ -34,4 +34,4 @@ def main():
     print(f"The service account OAuth token is: \n {sa_token}")
 
 if __name__ == "__main__":
-    main()
+    gke_lister()
