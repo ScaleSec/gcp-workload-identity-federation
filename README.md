@@ -1,6 +1,6 @@
 # Scalesec GCP Workload Identity Federation
 
-[![.github/workflows/python-linter.yml](https://github.com/ScaleSec/gcp-workload-identity-federation/actions/workflows/python-linter.yml/badge.svg](https://github.com/ScaleSec/gcp-workload-identity-federation/actions/workflows/python-linter.yml) [![CodeQL](https://github.com/ScaleSec/gcp-workload-identity-federation/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ScaleSec/gcp-workload-identity-federation/actions/workflows/codeql-analysis.yml)
+[![.github/workflows/python-linter.yml](https://github.com/ScaleSec/gcp-workload-identity-federation/actions/workflows/python-linter.yml/badge.svg)](https://github.com/ScaleSec/gcp-workload-identity-federation/actions/workflows/python-linter.yml) [![CodeQL](https://github.com/ScaleSec/gcp-workload-identity-federation/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ScaleSec/gcp-workload-identity-federation/actions/workflows/codeql-analysis.yml)
 
 This package provides a python module to federate access from AWS to GCP using Workload Identity. View our [blog](https://scalesec.com/blog/access-gcp-from-aws-using-workload-identity-federation/) for additional details.
 
