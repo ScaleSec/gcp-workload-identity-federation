@@ -103,6 +103,11 @@ token_service = TokenService(
 sa_token, expiry_date = token_service.get_token()
 ```
 
+The default expiry_date is 1h in GCP. This behaviour can be changed by overriding the 
+parameter `gcp_token_lifetime` in the `TokenService`. Check the 
+[API docs](https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials#sa-credentials-oauth) 
+for valid values and required configurations.
+
 ## Testing
 
 ```shell
