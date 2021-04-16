@@ -108,6 +108,25 @@ parameter `gcp_token_lifetime` in the `TokenService`. Check the
 [API docs](https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials#sa-credentials-oauth) 
 for valid values and required configurations.
 
+```python
+from scalesec_gcp_workload_identity.main import TokenService
+from os import getenv
+
+# The default lifetime of 1h can be overridden to use
+# a different duration.
+
+token_service = TokenService(
+  gcp_project_number=getenv('GCP_PROJECT_NUMBER'),
+  gcp_workload_id=getenv('GCP_WORKLOAD_ID'),
+  gcp_workload_provider=getenv('GCP_WORKLOAD_PROVIDER'),
+  gcp_service_account_email=getenv('GCP_SERVICE_ACCOUNT_EMAIL'),
+  aws_account_id=getenv('AWS_ACCOUNT_ID'),
+  aws_role_name=getenv('AWS_ROLE_NAME'),
+  aws_region=getenv('AWS_REGION'),
+  gcp_token_lifetime='21600s' # 6 hours
+)
+```
+
 ## Testing
 
 ```shell
