@@ -22,7 +22,8 @@ class TokenService: #pylint: disable=too-many-instance-attributes
         gcp_service_account_email: str,
         aws_account_id: str,
         aws_role_name: str,
-        aws_region: str
+        aws_region: str,
+        gcp_token_lifetime: str = "3600s"
         ) -> None:
 
         # GCP
@@ -30,6 +31,7 @@ class TokenService: #pylint: disable=too-many-instance-attributes
         self.gcp_workload_id = gcp_workload_id
         self.gcp_provider = gcp_workload_provider
         self.gcp_service_account_email = gcp_service_account_email
+        self.gcp_token_lifetime = gcp_token_lifetime
 
         self.gcp_federated_token = None
         self.gcp_sa_token = None
@@ -93,6 +95,6 @@ class TokenService: #pylint: disable=too-many-instance-attributes
             )
 
         # get the SA token
-        self.gcp_sa_token, sa_expire_time = self.utils._get_sa_token(federated_access_token) #pylint: disable=protected-access
+        self.gcp_sa_token, sa_expire_time = self.utils._get_sa_token(federated_access_token, self.gcp_token_lifetime) #pylint: disable=protected-access
 
         return self.gcp_sa_token, sa_expire_time
