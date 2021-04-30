@@ -24,14 +24,18 @@ def gke_lister():
         gcp_service_account_email=getenv('GCP_SERVICE_ACCOUNT_EMAIL'),
         aws_account_id=getenv('AWS_ACCOUNT_ID'),
         aws_role_name=getenv('AWS_ROLE_NAME'),
-        aws_region=getenv('AWS_REGION')
+        aws_region=getenv('AWS_REGION'),
+        gcp_token_lifetime=getenv('TOKEN_LIFETIME')
     )
 
     # Return our GCP SA access token
     # This sa_token is used for listing our GKE clusters
     sa_token, expiry_date = token_service.get_token() #pylint: disable=unused-variable
 
-    print(f"The service account OAuth token is: \n {sa_token}")
+    print(f"The service account OAuth token is: \n {sa_token} \n")
+
+    print(f"The expiry is: {expiry_date} \n")
+
 
 if __name__ == "__main__":
     gke_lister()
