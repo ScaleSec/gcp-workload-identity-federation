@@ -4,7 +4,7 @@
 
 This package provides a python module to federate access from AWS to GCP using Workload Identity. View our [blog](https://scalesec.com/blog/access-gcp-from-aws-using-workload-identity-federation/) for additional details.
 
-## Prerequisites 
+## Prerequisites
 * A GCP service account (environment variable "GCP_SERVICE_ACCOUNT_EMAIL")
 * An AWS IAM role (environment variable "AWS_ROLE_NAME")
 * AWS credentials (environment variable "AWS_PROFILE")
@@ -12,34 +12,46 @@ This package provides a python module to federate access from AWS to GCP using W
 
 ## Quick start
 
-```shell
+```bash
 # Create venv and install package
 make setup
 source .venv/bin/activate
 pip install scalesec-gcp-workload-identity
 ```
 
-```shell
+```bash
 # Rename example .env
 mv .env.example .env
+```
 
+```bash
 # Enter your own environment variables
 cat <<EOF >.env
+# GCP
 export GCP_PROJECT_NUMBER=
 export GCP_PROJECT_ID=
+
+# gcp workload identity pool id
 export GCP_WORKLOAD_ID=
 export GCP_WORKLOAD_PROVIDER=
 export GCP_SERVICE_ACCOUNT_EMAIL=
+
+# aws
 export AWS_REGION=
 export AWS_ACCOUNT_ID=
 export AWS_ROLE_NAME=
-EOF
 
+# Token expiry
+export TOKEN_LIFETIME=
+EOF
+```
+
+```bash
 # Source the environment variables so they are exposed
 source .env
 ```
 
-```shell
+```bash
 # set up GCP credentials
 gcloud auth login
 
@@ -64,7 +76,7 @@ gcloud beta iam workload-identity-pools create "$GCP_WORKLOAD_ID" \
 gcloud beta iam workload-identity-pools providers create-aws "$GCP_WORKLOAD_PROVIDER" \
   --location="global" \
   --workload-identity-pool="$GCP_WORKLOAD_ID" \
-  --account-id="$AWS_ACCOUNT_ID" 
+  --account-id="$AWS_ACCOUNT_ID"
 
 # Add the appropriate IAM binding to a pre-existing service account
 gcloud iam service-accounts add-iam-policy-binding $GCP_SERVICE_ACCOUNT_EMAIL \
@@ -76,7 +88,7 @@ gcloud iam service-accounts add-iam-policy-binding $GCP_SERVICE_ACCOUNT_EMAIL \
 
 Set your AWS credentials
 
-```shell
+```bash
 export AWS_PROFILE=xyz
 ```
 
@@ -86,7 +98,7 @@ Getting a Service Account token is now simple:
 from scalesec_gcp_workload_identity.main import TokenService
 from os import getenv
 
-# The arguments to TokenService can be ingested 
+# The arguments to TokenService can be ingested
 # from the environment if they were exported above.
 # Otherwise, pass in your own arguments
 
@@ -97,35 +109,31 @@ token_service = TokenService(
   gcp_service_account_email=getenv('GCP_SERVICE_ACCOUNT_EMAIL'),
   aws_account_id=getenv('AWS_ACCOUNT_ID'),
   aws_role_name=getenv('AWS_ROLE_NAME'),
-  aws_region=getenv('AWS_REGION')
+  aws_region=getenv('AWS_REGION'),
+  gcp_token_lifetime=getenv('TOKEN_LIFETIME')
 )
 
 sa_token, expiry_date = token_service.get_token()
 ```
 
-The default expiry_date is 1h in GCP. This behaviour can be changed by overriding the 
-parameter `gcp_token_lifetime` in the `TokenService`. Check the 
-[API docs](https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials#sa-credentials-oauth) 
-for valid values and required configurations.
+### Token expiration
 
-```python
-from scalesec_gcp_workload_identity.main import TokenService
-from os import getenv
+The default expiration for a service account token is 1h in GCP. This behavior can be changed by overriding the environment variable `TOKEN_LIFETIME` in the `.env` file. By default, GCP does not allow tokens to have an expiry over 1 hour and an organization policy __must__ be updated for this change to take affect. The organization policy is called `iam.allowServiceAccountCredentialLifetimeExtension` and it accepts a list of service accounts that are allowed to have an > 1 hr token.
 
-# The default lifetime of 1h can be overridden to use
-# a different duration.
+```bash
+# To configure the organization policy
+gcloud org-policies set-policy policy.yaml
 
-token_service = TokenService(
-  gcp_project_number=getenv('GCP_PROJECT_NUMBER'),
-  gcp_workload_id=getenv('GCP_WORKLOAD_ID'),
-  gcp_workload_provider=getenv('GCP_WORKLOAD_PROVIDER'),
-  gcp_service_account_email=getenv('GCP_SERVICE_ACCOUNT_EMAIL'),
-  aws_account_id=getenv('AWS_ACCOUNT_ID'),
-  aws_role_name=getenv('AWS_ROLE_NAME'),
-  aws_region=getenv('AWS_REGION'),
-  gcp_token_lifetime='21600s' # 6 hours
-)
+# An example policy.json:
+name: projects/1234567890/policies/iam.allowServiceAccountCredentialLifetimeExtension
+spec:
+  etag: BwXBMNmIrQg=
+  rules:
+  - values:
+      allowedValues:
+      - your-sa@yourproject.iam.gserviceaccount.com
 ```
+
 
 ## Testing
 
