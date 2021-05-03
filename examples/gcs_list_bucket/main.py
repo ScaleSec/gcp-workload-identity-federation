@@ -27,7 +27,8 @@ def gcs_object_lister():
         gcp_service_account_email=getenv('GCP_SERVICE_ACCOUNT_EMAIL'),
         aws_account_id=getenv('AWS_ACCOUNT_ID'),
         aws_role_name=getenv('AWS_ROLE_NAME'),
-        aws_region=getenv('AWS_REGION')
+        aws_region=getenv('AWS_REGION'),
+        gcp_token_lifetime=getenv('TOKEN_LIFETIME')
     )
 
     # Return our GCP SA access token
@@ -51,8 +52,9 @@ def gcs_object_lister():
     object_names = json.dumps(files, indent=4)
 
     # Print our object names found in our bucket
-    print(f"The items in bucket {bucket_name} are: {object_names}")
+    print(f"The items in bucket {bucket_name} are: {object_names} \n")
 
+    print(f"The expiry is: {expiry_date}.")
 
 if __name__ == "__main__":
     gcs_object_lister()
