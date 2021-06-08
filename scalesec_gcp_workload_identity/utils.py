@@ -224,7 +224,7 @@ class Utils: #pylint: disable=too-many-instance-attributes,too-few-public-method
 
         return federated_token
 
-    def _get_sa_token(self, federated_token: str, gcp_token_lifetime: str) -> Tuple[str, str]:
+    def _get_sa_token(self, federated_token: str, gcp_token_lifetime: str, gcp_token_scopes: str) -> Tuple[str, str]:
         """
         Exchanges a federated token (limited service support) for a a better supported SA token
 
@@ -237,9 +237,7 @@ class Utils: #pylint: disable=too-many-instance-attributes,too-few-public-method
 
         # Create the body for our token exchange request
         body = {
-            "scope": [
-                "https://www.googleapis.com/auth/cloud-platform"
-            ],
+            "scope": gcp_token_scopes.split(","),
             "lifetime": gcp_token_lifetime
         }
 
