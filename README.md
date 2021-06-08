@@ -110,7 +110,8 @@ token_service = TokenService(
   aws_account_id=getenv('AWS_ACCOUNT_ID'),
   aws_role_name=getenv('AWS_ROLE_NAME'),
   aws_region=getenv('AWS_REGION'),
-  gcp_token_lifetime=getenv('TOKEN_LIFETIME')
+  gcp_token_lifetime=getenv('TOKEN_LIFETIME'),
+  gcp_token_scopes=getenv('TOKEN_SCOPES')
 )
 
 sa_token, expiry_date = token_service.get_token()
@@ -134,6 +135,9 @@ spec:
       - your-sa@yourproject.iam.gserviceaccount.com
 ```
 
+#### Token scopes
+
+The default scope for the service account token is `https://www.googleapis.com/auth/cloud-platform`. This behaviour can be overridden to enable a different set of scopes by using the environment variable `TOKEN_SCOPES` in the `.env` file.
 
 ## Testing
 
