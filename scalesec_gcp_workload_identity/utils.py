@@ -224,7 +224,7 @@ class Utils: #pylint: disable=too-many-instance-attributes,too-few-public-method
 
         return federated_token
 
-    def _get_sa_token(self, federated_token: str, gcp_token_lifetime: str, gcp_token_scopes: str) -> Tuple[str, str]:
+    def _get_sa_token(self, federated_token: str, gcp_token_lifetime: str, gcp_token_scopes: str) -> Tuple[str, str]: #pylint: disable=line-too-long
         """
         Exchanges a federated token (limited service support) for a a better supported SA token
 
