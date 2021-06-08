@@ -41,8 +41,9 @@ export AWS_REGION=
 export AWS_ACCOUNT_ID=
 export AWS_ROLE_NAME=
 
-# Token expiry
+# Non-required vars
 export TOKEN_LIFETIME=
+export TOKEN_SCOPES=
 EOF
 ```
 
@@ -110,8 +111,8 @@ token_service = TokenService(
   aws_account_id=getenv('AWS_ACCOUNT_ID'),
   aws_role_name=getenv('AWS_ROLE_NAME'),
   aws_region=getenv('AWS_REGION'),
-  gcp_token_lifetime=getenv('TOKEN_LIFETIME'),
-  gcp_token_scopes=getenv('TOKEN_SCOPES')
+  gcp_token_lifetime=getenv('TOKEN_LIFETIME'), # Not required
+  gcp_token_scopes=getenv('TOKEN_SCOPES') # Not required
 )
 
 sa_token, expiry_date = token_service.get_token()
