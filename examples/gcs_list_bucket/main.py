@@ -28,7 +28,6 @@ def gcs_object_lister():
         aws_account_id=getenv('AWS_ACCOUNT_ID'),
         aws_role_name=getenv('AWS_ROLE_NAME'),
         aws_region=getenv('AWS_REGION'),
-        gcp_token_lifetime=getenv('TOKEN_LIFETIME')
     )
 
     # Return our GCP SA access token
