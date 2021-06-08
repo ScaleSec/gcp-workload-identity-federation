@@ -137,7 +137,7 @@ spec:
 
 #### Token scopes
 
-The default scope for the service account token is `https://www.googleapis.com/auth/cloud-platform`. This behaviour can be overridden to enable a different set of scopes by using the environment variable `TOKEN_SCOPES` in the `.env` file.
+The default scope for the service account token is `https://www.googleapis.com/auth/cloud-platform`. This behaviour can be overridden to enable a different set of scopes by using the environment variable `TOKEN_SCOPES` in the `.env` file with a comma-separated list of GCP scopes.
 
 ## Testing
 
